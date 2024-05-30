@@ -47,8 +47,6 @@ const UserList = lazy(
   () => import(/* webpackChunkName: "user-list" */ "@/pages/User/List/List"),
 );
 
-import "./index.css";
-
 const router = createBrowserRouter([
   {
     path: "/",

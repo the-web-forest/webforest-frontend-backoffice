@@ -1,9 +1,14 @@
 import { lazy } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter } from "react-router-dom";
+import { AuthHOC } from "./components/common/AuthHOC";
 
 /* Login */
 const Login = lazy(
   () => import(/* webpackChunkName: "login" */ "@/pages/Login/Login"),
+);
+
+const Logout = lazy(
+  () => import(/* webpackChunkName: "logout" */ "@/pages/Logout/Logout"),
 );
 
 /* Partner */
@@ -50,58 +55,68 @@ const UserList = lazy(
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>se deslogado redirect /login, se logado redirect /user</div>,
+    element: <AuthHOC />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/tree" replace />,
+      },
+      {
+        path: "/partner",
+        children: [
+          {
+            index: true,
+            element: <PartnerList />,
+          },
+          {
+            path: "/partner/create",
+            element: <PartnerCreate />,
+          },
+          {
+            path: "/partner/:id",
+            element: <PartnerEdit />,
+          },
+        ],
+      },
+      {
+        path: "/tree",
+        children: [
+          {
+            index: true,
+            element: <TreeList />,
+          },
+          {
+            path: "/tree/create",
+            element: <TreeCreate />,
+          },
+          {
+            path: "/tree/:id",
+            element: <TreeEdit />,
+          },
+        ],
+      },
+      {
+        path: "/user",
+        children: [
+          {
+            index: true,
+            element: <UserList />,
+          },
+          {
+            path: "/user/:id",
+            element: <UserEdit />,
+          },
+        ],
+      },
+      {
+        path: "logout",
+        element: <Logout />,
+      },
+    ],
   },
   {
     path: "/login",
     element: <Login />,
-  },
-  {
-    path: "/partner",
-    children: [
-      {
-        index: true,
-        element: <PartnerList />,
-      },
-      {
-        path: "/partner/create",
-        element: <PartnerCreate />,
-      },
-      {
-        path: "/partner/:id",
-        element: <PartnerEdit />,
-      },
-    ],
-  },
-  {
-    path: "/tree",
-    children: [
-      {
-        index: true,
-        element: <TreeList />,
-      },
-      {
-        path: "/tree/create",
-        element: <TreeCreate />,
-      },
-      {
-        path: "/tree/:id",
-        element: <TreeEdit />,
-      },
-    ],
-  },
-  {
-    path: "/user",
-    children: [
-      {
-        index: true,
-        element: <UserList />,
-      },
-      {
-        path: "/user/:id",
-        element: <UserEdit />,
-      },
-    ],
   },
 ]);
 

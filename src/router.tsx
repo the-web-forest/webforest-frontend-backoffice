@@ -52,6 +52,18 @@ const UserList = lazy(
   () => import(/* webpackChunkName: "user-list" */ "@/pages/User/List/List"),
 );
 
+/* Biome */
+const BiomeCreate = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "biome-create" */ "@/pages/Biome/Create/Create"
+    ),
+);
+
+const BiomeList = lazy(
+  () => import(/* webpackChunkName: "biome-list" */ "@/pages/Biome/List/List"),
+);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -105,6 +117,19 @@ const router = createBrowserRouter([
           {
             path: "/user/:id",
             element: <UserEdit />,
+          },
+        ],
+      },
+      {
+        path: "/biome",
+        children: [
+          {
+            index: true,
+            element: <BiomeList />,
+          },
+          {
+            path: "/biome/create",
+            element: <BiomeCreate />,
           },
         ],
       },

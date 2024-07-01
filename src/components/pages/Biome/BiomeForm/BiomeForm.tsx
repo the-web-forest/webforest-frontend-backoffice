@@ -30,7 +30,6 @@ export function BiomeForm() {
   });
 
   async function onSubmit({ name }: BiomeSchema) {
-    // console.log({ name });
     createBiome({ name });
   }
 

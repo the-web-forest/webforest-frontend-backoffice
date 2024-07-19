@@ -1,5 +1,4 @@
-export const USER_NAME = "USER_NAME";
-export const TOKEN_TYPE = "TOKEN_TYPE";
 export const TOKEN = "TOKEN";
+export const TOKEN_EXPIRATION = "TOKEN_EXPIRATION";
 
-export default { USER_NAME, TOKEN_TYPE, TOKEN };
+export default { TOKEN, TOKEN_EXPIRATION };

@@ -1,53 +1,98 @@
-import * as React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { redirect } from "react-router-dom";
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { postLogin } from "@/services/Api/User/Login/postLogin";
+import useAuth from "@/hooks/useAuth";
+
+const authSchema = z.object({
+  email: z
+    .string({ required_error: "Campo obrigatório" })
+    .email("E-mail inválido"),
+  password: z
+    .string({ required_error: "Campo obrigatório" })
+    .min(1, "Senha inválida"),
+});
+
+type AuthSchema = z.infer<typeof authSchema>;
 
 export function AuthForm() {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const { login } = useAuth();
+  const form = useForm<AuthSchema>({
+    resolver: zodResolver(authSchema),
+  });
 
-  async function onSubmit(event: React.SyntheticEvent) {
-    event.preventDefault();
-    setIsLoading(true);
+  const { errors, isSubmitting } = form.formState;
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+  async function onSubmit({ email, password }: AuthSchema) {
+    try {
+      const { token, expiration } = await postLogin({ email, password });
+      login({ token, tokenExpiration: expiration });
+      redirect("/tree");
+    } catch {
+      form.setError("root", { type: "root", message: "Erro no login" });
+    }
   }
 
   return (
     <div className="grid gap-6">
-      <form onSubmit={onSubmit}>
-        <div className="grid gap-2">
-          <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="email">
-              Email
-            </Label>
-            <Input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              disabled={isLoading}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="grid gap-2">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="sr-only">Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Lorax@email.com"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      autoCorrect="off"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-1">
-            <Label className="sr-only" htmlFor="email">
-              Senha
-            </Label>
-            <Input
-              id="password"
-              placeholder="Senha"
-              type="password"
-              disabled={isLoading}
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="sr-only">Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Senha"
+                      type="password"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
+            <Button disabled={isSubmitting}>Entrar</Button>
+            {errors.root && <p>{errors.root.message}</p>}
           </div>
-          <Button disabled={isLoading}>Entrar</Button>
-        </div>
-      </form>
+        </form>
+      </Form>
     </div>
   );
 }
